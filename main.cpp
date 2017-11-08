@@ -4,18 +4,11 @@
  * Distribution of this application is allowed, although
  * upon distribution kindly do mention the author.
  */
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+// See: https://stackoverflow.com/a/37435682/4332216
+#define _BSD_SOURCE
 #include "Server.h"
 
 int main () {
-  Server server("name");
-  server.do_something();
+  Server server("Fuckturd");
+  server.start();
 }
