@@ -9,6 +9,9 @@
 #include "Server.h"
 
 int main () {
-  Server server("Fuckturd");
+  std::ifstream ifs("Resources/file.html");
+  std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                       (std::istreambuf_iterator<char>()    ) );
+  Server server(content);
   server.start();
 }

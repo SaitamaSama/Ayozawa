@@ -14,6 +14,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fstream>
+#include <sstream>
+#include <regex>
 
 typedef sockaddr_in sockaddr_in_t;
 typedef sockaddr sockaddr_t;
@@ -25,14 +28,25 @@ private:
   socklen_t remote_addr_length;
   char buffer[1024];
   sockaddr_in_t serv_addr, remote_addr;
+  std::string _file_content;
+
+  std::string replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    return str.replace(start_pos, from.length(), to);
+  }
 
   void err(std::string message) {
     std::cout << message << "\n";
     close(socketfd);
     exit(1);
   }
+
 public:
-  Server(std::string stroke) {
+  Server(std::string static_file_content) {
+    _file_content = static_file_content;
+
     socketfd =  socket(AF_INET, SOCK_STREAM, 0);
 
     if(socketfd < 0) {
@@ -45,6 +59,7 @@ public:
     serv_addr.sin_port = htons(8080);
 
     int bind_result = bind(socketfd, (sockaddr_t *) &serv_addr, sizeof(serv_addr));
+
     if(bind_result < 0) {
       err("Error binding address to socket.");
     }
@@ -78,6 +93,14 @@ public:
       }
 
       printf("Incoming Headers: %s\n", buffer);
+
+      // We shall send just a static file for now...
+      std::string response("HTTP/1.1 200 OK\r\nContent-Length: "
+        + std::to_string(strlen(_file_content.c_str()))
+        + "\r\nX-Server: Ayozawa-1.0\r\n\r\n"
+        + _file_content
+      );
+      send(newsocketfd, response.c_str(), response.length(), 0);
 
       close(newsocketfd);
     } while (1);
