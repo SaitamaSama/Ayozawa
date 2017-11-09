@@ -12,6 +12,6 @@ int main () {
   std::ifstream ifs("Resources/file.html");
   std::string content( (std::istreambuf_iterator<char>(ifs) ),
                        (std::istreambuf_iterator<char>()    ) );
-  Server server(content);
+  Server server(8080, content);
   server.start();
 }

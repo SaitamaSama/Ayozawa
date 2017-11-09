@@ -24,7 +24,7 @@ typedef sockaddr sockaddr_t;
 
 class Server {
 private:
-  int socketfd, newsocketfd, port;
+  int socketfd, newsocketfd, _port;
   socklen_t remote_addr_length;
   char buffer[1024];
   sockaddr_in_t serv_addr, remote_addr;
@@ -44,7 +44,8 @@ private:
   }
 
 public:
-  Server(std::string static_file_content) {
+  Server(int port, std::string static_file_content) {
+    _port = port;
     _file_content = static_file_content;
 
     socketfd =  socket(AF_INET, SOCK_STREAM, 0);
@@ -56,7 +57,7 @@ public:
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(port);
 
     int bind_result = bind(socketfd, (sockaddr_t *) &serv_addr, sizeof(serv_addr));
 
@@ -66,6 +67,7 @@ public:
   }
 
   void start() {
+    printf("Started listening on port %d...\nGo to http://localhost:8080 to see it in action\n", _port);
     listen(socketfd, 2);
     do {
       remote_addr_length = sizeof(remote_addr);
